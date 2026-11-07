@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiprocessors &amp; Multi-Core Systems · Exam Notes</title>
+    <style>
+        /* Blue & White theme — clean, exam-ready */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2rem 2.2rem 2.4rem;
+            transition: all 0.2s;
+        }
+
+        /* accent bar */
+        .note-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.45rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .story {
+            background: #e9f2ff;
+            border-left: 8px solid #1a6eff;
+            padding: 1.2rem 1.7rem;
+            border-radius: 0 18px 18px 0;
+            margin: 1.5rem 0 1.8rem 0;
+            font-weight: 500;
+            font-size: 1.07rem;
+            line-height: 1.6;
+            color: #0040a0;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.08);
+            transition: 0.1s;
+        }
+
+        .story strong {
+            color: #002b6b;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00337a;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #b8d6ff 20%, #ffffff 100%);
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b4b9e;
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 i {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0047b3;
+        }
+
+        /* term list styling */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid #d0e3ff;
+            transition: 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 80, 180, 0.03);
+        }
+
+        .term-item:hover {
+            background: #edf5ff;
+            border-color: #97c1ff;
+        }
+
+        .term-badge {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            min-width: 130px;
+            text-align: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .term-def {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #002856;
+            font-weight: 450;
+        }
+
+        .term-def strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* key points card */
+        .key-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.2rem 1.5rem 1.4rem;
+            border: 2px solid #c2dbff;
+            box-shadow: 0 10px 20px -10px #003b8f33;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .key-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.5rem;
+        }
+
+        .key-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .key-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .key-card ul li strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* comparison tables */
+        .comp-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+            margin: 1.2rem 0 1rem;
+        }
+
+        .comp-table th {
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #00337a;
+            padding: 0.6rem 1rem;
+            background: #e9f2ff;
+            border-radius: 12px;
+        }
+
+        .comp-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .comp-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .comp-table td {
+            background: #ffffff;
+            padding: 0.75rem 1rem;
+            font-size: 0.92rem;
+            color: #003174;
+            border-top: 1px solid #e3efff;
+            border-bottom: 1px solid #e3efff;
+            line-height: 1.45;
+        }
+
+        .comp-table td:first-child {
+            border-left: 1px solid #e3efff;
+            border-radius: 12px 0 0 12px;
+            font-weight: 600;
+            color: #003b8f;
+        }
+
+        .comp-table td:last-child {
+            border-right: 1px solid #e3efff;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .comp-table tr:hover td {
+            background: #f4f9ff;
+        }
+
+        /* why multicore grid */
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.1rem;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .why-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.1rem 1.3rem 1.2rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 8px 18px -10px #003b8f2a;
+            transition: 0.15s ease;
+        }
+
+        .why-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px -10px #1a6eff55;
+        }
+
+        .why-card h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.45rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .why-card p {
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: #003174;
+        }
+
+        .why-card .formula-inline {
+            display: inline-block;
+            background: #f0f7ff;
+            border: 1px dashed #7fb3ff;
+            color: #00337a;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 0.15rem 0.65rem;
+            border-radius: 8px;
+            margin-top: 0.4rem;
+        }
+
+        /* cache org list */
+        .cache-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin: 1rem 0 1rem;
+        }
+
+        .cache-item {
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 14px;
+            border-left: 6px solid #1a6eff;
+            font-size: 0.94rem;
+            line-height: 1.5;
+            color: #003174;
+            box-shadow: 0 3px 8px rgba(0, 60, 140, 0.04);
+        }
+
+        .cache-item strong {
+            color: #003b8f;
+        }
+
+        /* amdahl formula card */
+        .amdahl-card {
+            background: #f0f7ff;
+            border-radius: 18px;
+            padding: 1.2rem 1.5rem;
+            margin: 1rem 0 1.1rem;
+            border: 1px dashed #7fb3ff;
+            box-shadow: 0 4px 10px rgba(0, 80, 200, 0.05);
+            font-weight: 600;
+            color: #00337a;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .amdahl-card .label {
+            display: inline-block;
+            background: #1a6eff;
+            color: white;
+            padding: 0.12rem 0.75rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            margin-right: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .amdahl-card .sub {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #4a6f9e;
+            margin-top: 0.25rem;
+        }
+
+        .amdahl-card em {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.05rem 0.45rem;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #003b8f;
+        }
+
+        /* worked example */
+        .example-card {
+            background: #fff8e6;
+            border-radius: 18px;
+            padding: 1rem 1.4rem;
+            border-left: 6px solid #d4a017;
+            margin: 1rem 0 1.1rem;
+            box-shadow: 0 4px 12px rgba(200, 150, 0, 0.08);
+            color: #664d00;
+            font-size: 0.95rem;
+            line-height: 1.55;
+        }
+
+        .example-card strong {
+            color: #4d3a00;
+        }
+
+        .example-card .calc {
+            display: inline-block;
+            background: #ffffff;
+            border: 1px solid #f0dca8;
+            border-radius: 8px;
+            padding: 0.2rem 0.7rem;
+            font-weight: 700;
+            color: #7a5600;
+            margin-top: 0.35rem;
+        }
+
+        /* exam point card */
+        .exam-point {
+            background: #003b8f;
+            color: white;
+            border-radius: 22px;
+            padding: 1.4rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 16px 28px -12px #003b8f99,
+                        inset 0 1px 0 #ffffff40;
+            border: 1px solid #7fb3ff;
+        }
+
+        .exam-point .header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-point .shield {
+            background: #ffffff20;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #b8d6ff;
+            border: 1px solid #8bb8ff;
+        }
+
+        .exam-point .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.02rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: white;
+        }
+
+        .exam-point .rows span.hl {
+            background: #ffd966;
+            color: #003b8f;
+            padding: 0.1rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* small divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, #c2dbff, #ffffff);
+            margin: 1.8rem 0 0.5rem;
+        }
+
+        /* responsive fine-tune */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .note-card {
+                padding: 1.6rem 1.2rem 1.8rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .story {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            .term-item {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            .term-badge {
+                min-width: auto;
+                align-self: flex-start;
+            }
+            .exam-point {
+                padding: 1.3rem 1.5rem;
+            }
+            .exam-point .rows {
+                font-size: 0.95rem;
+            }
+            .comp-table th,
+            .comp-table td {
+                padding: 0.5rem 0.7rem;
+                font-size: 0.82rem;
+            }
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+            .amdahl-card {
+                padding: 0.9rem 1rem;
+                font-size: 0.92rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="note-card">
+        <h1>📝 Multiprocessors &amp; Multi-Core Systems <span>Topic 7</span></h1>
+
+        <!-- 1-sentence story -->
+        <div class="story">
+            <strong>The 1-Sentence Story:</strong> Multiprocessors and multi-core systems achieve higher throughput by executing multiple threads or processes simultaneously, but their performance is limited by shared bus contention, cache coherence, and the serial fraction of programs (Amdahl's Law).
+        </div>
+
+        <!-- definitions -->
+        <h2>📌 Definitions &amp; Key Terms</h2>
+        <div class="terms-grid">
+            <div class="term-item">
+                <div class="term-badge">SMP</div>
+                <div class="term-def">Symmetric Multiprocessor: two or more comparable processors sharing main memory and I/O, managed by an integrated OS.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Multiprogramming</div>
+                <div class="term-def">One CPU, several processes interleaved (fake parallelism).</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Multiprocessing</div>
+                <div class="term-def">Multiple CPUs, processes execute simultaneously (true parallelism).</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">UMA</div>
+                <div class="term-def">Uniform Memory Access: all processors access a single shared memory with approximately equal latency.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">NUMA</div>
+                <div class="term-def">Non-Uniform Memory Access: memory is distributed; local access is faster than remote access.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Multi-Core Processor</div>
+                <div class="term-def">Multiple processor cores integrated on a single silicon die.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Amdahl's Law</div>
+                <div class="term-def">Speedup is limited by the serial fraction of a program.</div>
+            </div>
+        </div>
+
+        <!-- SMP characteristics -->
+        <h2>🖥️ SMP Characteristics</h2>
+        <div class="key-card">
+            <h4>🔹 Symmetric Multiprocessor</h4>
+            <ul>
+                <li>Two or more similar processors.</li>
+                <li>Shared main memory (UMA).</li>
+                <li>Shared I/O resources.</li>
+                <li>Approximately uniform memory access time.</li>
+                <li>Integrated OS coordinates all processors.</li>
+                <li><strong>"Symmetric"</strong> means no processor is permanently restricted to special tasks.</li>
+            </ul>
+        </div>
+
+        <!-- shared bus bottleneck -->
+        <h2>🚧 Shared Bus Bottleneck <i>(SMP)</i></h2>
+        <div class="key-card">
+            <h4>🔹 Bus Contention</h4>
+            <ul>
+                <li>Only one bus master can control the bus at a time.</li>
+                <li>Adding processors increases bus traffic and contention.</li>
+                <li><strong>Solution:</strong> private caches reduce bus traffic (only cache misses require the bus).</li>
+            </ul>
+        </div>
+
+        <!-- multiprogramming vs multiprocessing -->
+        <h2>⚖️ Multiprogramming vs. Multiprocessing</h2>
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Multiprogramming</th>
+                    <th>Multiprocessing</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>CPU</td>
+                    <td>One CPU</td>
+                    <td>Multiple CPUs</td>
+                </tr>
+                <tr>
+                    <td>Execution</td>
+                    <td>Interleaved</td>
+                    <td>Simultaneous</td>
+                </tr>
+                <tr>
+                    <td>Goal</td>
+                    <td>Maximize CPU utilization</td>
+                    <td>True parallel throughput</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- UMA vs NUMA -->
+        <h2>🧠 UMA vs. NUMA</h2>
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>UMA</th>
+                    <th>NUMA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Memory</td>
+                    <td>Single shared memory</td>
+                    <td>Distributed memory</td>
+                </tr>
+                <tr>
+                    <td>Access Time</td>
+                    <td>Uniform</td>
+                    <td>Local fast, remote slow</td>
+                </tr>
+                <tr>
+                    <td>Scalability</td>
+                    <td>Limited by bus bottleneck</td>
+                    <td>Scales better</td>
+                </tr>
+                <tr>
+                    <td>Example</td>
+                    <td>Bus-based SMP</td>
+                    <td>Multi-core with distributed L3</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- multi-core processors (why multicore) -->
+        <h2>🧩 Multi-Core Processors <i>(Why Multicore?)</i></h2>
+        <div class="why-grid">
+            <div class="why-card">
+                <h4>🔥 Power Consumption Limit</h4>
+                <p>Higher frequency = more heat. Multiple moderate cores are more power-efficient.</p>
+                <div class="formula-inline">P ∝ C·V²·f</div>
+            </div>
+            <div class="why-card">
+                <h4>📈 Pollack's Rule</h4>
+                <p>Performance ∝ √Complexity. Doubling core complexity yields only ≈41% performance increase. Multiple cores scale better.</p>
+            </div>
+            <div class="why-card">
+                <h4>⚙️ ILP Limits</h4>
+                <p>Available Instruction-Level Parallelism is limited. Multiple cores provide Thread-Level Parallelism (TLP).</p>
+            </div>
+        </div>
+
+        <!-- cache organizations for multicores -->
+        <h2>💾 Cache Organizations for Multicores</h2>
+        <div class="cache-list">
+            <div class="cache-item"><strong>Private L1:</strong> Always private to each core.</div>
+            <div class="cache-item"><strong>Private L2:</strong> Dedicated to one core (fast, less contention, but may duplicate data).</div>
+            <div class="cache-item"><strong>Shared L2/L3:</strong> Accessible by multiple cores (data reuse, flexible capacity, but contention and higher latency).</div>
+        </div>
+
+        <!-- Amdahl's law -->
+        <h2>📉 Amdahl's Law</h2>
+        <div class="amdahl-card">
+            <span class="label">Speedup</span> S(N) = 1 / [ (1 − f) + f/N ]
+            <span class="sub"><em>f</em> = parallelizable fraction &nbsp;·&nbsp; <em>N</em> = number of cores</span>
+        </div>
+        <div class="amdahl-card" style="margin-top:0;">
+            <span class="label">Max speedup</span> S<sub>max</sub> = 1 / (1 − f) &nbsp; (as N → ∞)
+        </div>
+
+        <!-- worked example -->
+        <div class="example-card">
+            <strong>🔢 Example:</strong> 90% parallelizable (f = 0.90), 8 cores:<br>
+            <span class="calc">S(8) = 1 / [0.10 + 0.1125] = 4.71</span>
+            <br><br>
+            <strong>The serial fraction is the ultimate bottleneck.</strong>
+        </div>
+
+        <!-- exam point -->
+        <div class="exam-point">
+            <div class="header">
+                <div class="shield">📌 KEY EXAM POINTS</div>
+            </div>
+            <div class="rows">
+                <div><span class="hl">SMP</span> = symmetric, shared memory, UMA.</div>
+                <div><span class="hl">Shared bus</span> = bottleneck as processors increase.</div>
+                <div><span class="hl">Private caches</span> reduce bus traffic.</div>
+                <div><span class="hl">Multicore</span> = power-efficient way to increase throughput.</div>
+                <div><span class="hl">Amdahl's Law</span> limits speedup based on the serial fraction.</div>
+                <div><span class="hl">MIMD</span> is the Flynn class for SMP and multicore systems.</div>
+            </div>
+        </div>
+
+        <!-- subtle divider (styling only) -->
+        <div class="divider"></div>
+    </div>
+</body>
+</html>

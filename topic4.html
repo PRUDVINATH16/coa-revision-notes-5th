@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Hazards · Exam Notes</title>
+    <style>
+        /* Blue & White theme — clean, exam-ready */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2rem 2.2rem 2.4rem;
+            transition: all 0.2s;
+        }
+
+        /* accent bar */
+        .note-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.45rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .story {
+            background: #e9f2ff;
+            border-left: 8px solid #1a6eff;
+            padding: 1.2rem 1.7rem;
+            border-radius: 0 18px 18px 0;
+            margin: 1.5rem 0 1.8rem 0;
+            font-weight: 500;
+            font-size: 1.07rem;
+            line-height: 1.6;
+            color: #0040a0;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.08);
+            transition: 0.1s;
+        }
+
+        .story strong {
+            color: #002b6b;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00337a;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #b8d6ff 20%, #ffffff 100%);
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b4b9e;
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 i {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0047b3;
+        }
+
+        /* term list styling */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid #d0e3ff;
+            transition: 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 80, 180, 0.03);
+        }
+
+        .term-item:hover {
+            background: #edf5ff;
+            border-color: #97c1ff;
+        }
+
+        .term-badge {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            min-width: 140px;
+            text-align: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .term-def {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #002856;
+            font-weight: 450;
+        }
+
+        .term-def strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* key points card */
+        .key-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.2rem 1.5rem 1.4rem;
+            border: 2px solid #c2dbff;
+            box-shadow: 0 10px 20px -10px #003b8f33;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .key-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.5rem;
+        }
+
+        .key-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .key-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .key-card ul li strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* code snippet */
+        .code-snippet {
+            background: #f4f9ff;
+            border: 1px solid #d0e3ff;
+            border-radius: 14px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.7rem 0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.92rem;
+            color: #00337a;
+            line-height: 1.7;
+            overflow-x: auto;
+            box-shadow: 0 3px 8px rgba(0, 60, 140, 0.04);
+        }
+
+        .code-snippet .comment {
+            color: #7c9ac0;
+            font-style: italic;
+        }
+
+        .code-snippet .instr {
+            font-weight: 600;
+        }
+
+        /* solutions grid */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.1rem;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .solution-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.2rem 1.3rem 1.3rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 8px 18px -10px #003b8f2a;
+            transition: 0.15s ease;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px -10px #1a6eff55;
+        }
+
+        .solution-card.hw {
+            border-top: 6px solid #1a6eff;
+        }
+
+        .solution-card.sw {
+            border-top: 6px solid #7c4dff;
+        }
+
+        .solution-card h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .solution-card.hw h4 {
+            color: #003b8f;
+        }
+
+        .solution-card.sw h4 {
+            color: #4a2bb3;
+        }
+
+        .solution-card p {
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: #003174;
+            margin-bottom: 0.5rem;
+        }
+
+        .solution-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .solution-card ul li {
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: #003174;
+            padding-left: 1.3rem;
+            position: relative;
+        }
+
+        .solution-card ul li::before {
+            content: '•';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.15rem;
+        }
+
+        .solution-card.sw ul li::before {
+            color: #7c4dff;
+        }
+
+        .solution-card .badge {
+            display: inline-block;
+            margin-top: 0.7rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.2rem 0.75rem;
+            border-radius: 30px;
+        }
+
+        .solution-card.hw .badge {
+            background: #e9f2ff;
+            color: #0047b3;
+            border: 1px solid #c2dbff;
+        }
+
+        .solution-card.sw .badge {
+            background: #f2edff;
+            color: #5b2bd6;
+            border: 1px solid #d6c8ff;
+        }
+
+        /* load-use hazard card */
+        .load-use-card {
+            background: #fff8e6;
+            border-radius: 18px;
+            padding: 1.1rem 1.4rem;
+            border-left: 6px solid #d4a017;
+            margin: 1.2rem 0 1rem;
+            box-shadow: 0 4px 12px rgba(200, 150, 0, 0.08);
+        }
+
+        .load-use-card h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #7a5600;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .load-use-card p {
+            font-size: 0.94rem;
+            line-height: 1.55;
+            color: #664d00;
+            margin-bottom: 0.4rem;
+        }
+
+        .load-use-card strong {
+            color: #4d3a00;
+        }
+
+        /* side effects card */
+        .side-effects-card {
+            background: #f9fcff;
+            border-radius: 18px;
+            padding: 1.1rem 1.4rem;
+            border-left: 6px solid #1a6eff;
+            margin: 1rem 0 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.04);
+        }
+
+        .side-effects-card h4 {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .side-effects-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .side-effects-card ul li {
+            font-size: 0.93rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.4rem;
+            position: relative;
+        }
+
+        .side-effects-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1rem;
+        }
+
+        .side-effects-card ul li strong {
+            color: #003b8f;
+            font-weight: 600;
+        }
+
+        /* exam point card */
+        .exam-point {
+            background: #003b8f;
+            color: white;
+            border-radius: 22px;
+            padding: 1.4rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 16px 28px -12px #003b8f99,
+                        inset 0 1px 0 #ffffff40;
+            border: 1px solid #7fb3ff;
+        }
+
+        .exam-point .header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-point .shield {
+            background: #ffffff20;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #b8d6ff;
+            border: 1px solid #8bb8ff;
+        }
+
+        .exam-point .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.02rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: white;
+        }
+
+        .exam-point .rows span.hl {
+            background: #ffd966;
+            color: #003b8f;
+            padding: 0.1rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* small divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, #c2dbff, #ffffff);
+            margin: 1.8rem 0 0.5rem;
+        }
+
+        /* responsive fine-tune */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .note-card {
+                padding: 1.6rem 1.2rem 1.8rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .story {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            .term-item {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            .term-badge {
+                min-width: auto;
+                align-self: flex-start;
+            }
+            .exam-point {
+                padding: 1.3rem 1.5rem;
+            }
+            .exam-point .rows {
+                font-size: 0.95rem;
+            }
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+            .code-snippet {
+                font-size: 0.82rem;
+                padding: 0.6rem 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="note-card">
+        <h1>📝 Data Hazards <span>Topic 4</span></h1>
+
+        <!-- 1-sentence story -->
+        <div class="story">
+            <strong>The 1-Sentence Story:</strong> Data hazards occur when an instruction depends on the result of a previous instruction that hasn't finished yet; they are solved through hardware stalling, operand forwarding, or compiler-based scheduling to maintain correct execution order.
+        </div>
+
+        <!-- definitions -->
+        <h2>📌 Definitions &amp; Key Terms</h2>
+        <div class="terms-grid">
+            <div class="term-item">
+                <div class="term-badge">Data Hazard</div>
+                <div class="term-def">A condition where an instruction depends on the result of a previous instruction that has not yet completed its execution.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">RAW</div>
+                <div class="term-def">Read-After-Write: instruction <em>j</em> reads an operand before instruction <em>i</em> writes it. <strong>(Most common hazard)</strong>.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">WAW</div>
+                <div class="term-def">Write-After-Write: instruction <em>j</em> writes an operand before instruction <em>i</em> writes it. (Only in out-of-order pipelines).</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">WAR</div>
+                <div class="term-def">Write-After-Read: instruction <em>j</em> writes an operand before instruction <em>i</em> reads it. (Only in out-of-order pipelines).</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Operand Forwarding</div>
+                <div class="term-def">(Bypassing): technique to resolve RAW hazards without stalling by forwarding the result directly from one pipeline stage to another.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Side Effect</div>
+                <div class="term-def">An instruction changes a register or flag other than its explicitly named destination (e.g., condition code flags, autoincrement, stack pointer).</div>
+            </div>
+        </div>
+
+        <!-- RAW hazard example -->
+        <h2>🔗 The RAW Hazard Problem <i>(Example)</i></h2>
+        <div class="key-card">
+            <div class="code-snippet">
+                <span class="instr">I₁: MUL R2, R3, R4</span> &nbsp;<span class="comment">// writes R4 in W₁</span><br>
+                <span class="instr">I₂: ADD R5, R4, R6</span> &nbsp;<span class="comment">// reads R4 in D₂</span>
+            </div>
+            <ul style="margin-top: 0.8rem;">
+                <li><strong>Problem:</strong> I₂ reaches Decode before I₁ finishes Write-back. I₂ reads the <strong>old value</strong> of R4.</li>
+            </ul>
+        </div>
+
+        <!-- solutions for data hazards -->
+        <h2>🛠️ Solutions for Data Hazards</h2>
+        <div class="solution-grid">
+
+            <!-- hardware: stalling -->
+            <div class="solution-card hw">
+                <h4>🧱 Pipeline Stalling <span style="font-weight:500; font-size:0.85rem; color:#4a6f9e;">(Hardware)</span></h4>
+                <p>Detect the hazard and freeze the pipeline (insert bubbles) until the data is ready.</p>
+                <ul>
+                    <li><strong>Disadvantage:</strong> wastes clock cycles, reduces throughput.</li>
+                </ul>
+                <span class="badge">✔ simple but costly</span>
+            </div>
+
+            <!-- hardware: forwarding -->
+            <div class="solution-card hw">
+                <h4>↪️ Operand Forwarding / Bypassing <span style="font-weight:500; font-size:0.85rem; color:#4a6f9e;">(Hardware)</span></h4>
+                <p>Forward the result directly from the ALU output (E stage) to the next instruction's ALU input (E stage).</p>
+                <ul>
+                    <li><strong>Paths:</strong> E → E (most common), W → E (when result isn't ready in time for E → E).</li>
+                    <li><strong>Advantage:</strong> eliminates stalls for most RAW hazards.</li>
+                    <li><strong>Limitation:</strong> cannot solve the Load-Use hazard (requires one stall cycle).</li>
+                </ul>
+                <span class="badge">✔ best for most RAW hazards</span>
+            </div>
+
+            <!-- software: compiler scheduling -->
+            <div class="solution-card sw">
+                <h4>🧠 Compiler-Based Scheduling <span style="font-weight:500; font-size:0.85rem; color:#6b4dc0;">(Software)</span></h4>
+                <p><strong>NOP Insertion:</strong> compiler inserts No-Operation instructions to delay the dependent instruction.</p>
+                <p><strong>Instruction Reordering:</strong> compiler moves independent instructions into the delay slots to do useful work.</p>
+                <ul>
+                    <li><strong>Advantages:</strong> simplifies hardware, compiler can optimize.</li>
+                    <li><strong>Disadvantages:</strong> increases code size, may reduce performance on processors with better hazard handling.</li>
+                </ul>
+                <span class="badge">📖 software-level fix</span>
+            </div>
+        </div>
+
+        <!-- load-use hazard -->
+        <h2>⚠️ Load-Use Hazard <i>(Why Forwarding Fails)</i></h2>
+        <div class="load-use-card">
+            <div class="code-snippet" style="background:#fffdf5; border-color:#f0dca8; margin-top:0;">
+                <span class="instr">I₁: LOAD R1, [Address]</span> &nbsp;<span class="comment">// data available only after Memory stage</span><br>
+                <span class="instr">I₂: ADD R2, R1, R3</span> &nbsp;<span class="comment">// needs data in Execute stage</span>
+            </div>
+            <p>The data arrives <strong>too late</strong> for I₂'s Execute stage, so <strong>one stall cycle</strong> is required.</p>
+        </div>
+
+        <!-- side effects -->
+        <h2>🧩 Side Effects <i>(Hidden Dependencies)</i></h2>
+        <div class="side-effects-card">
+            <ul>
+                <li><strong>Condition Code Flags:</strong> ADD modifies the Carry Flag; ADDC uses it.</li>
+                <li><strong>Autoincrement/Autodecrement:</strong> LOAD R1, (R2)+ implicitly modifies R2.</li>
+                <li><strong>Stack Operations:</strong> PUSH/POP implicitly modify the Stack Pointer (SP).</li>
+            </ul>
+            <p style="font-size:0.92rem; line-height:1.5; color:#003174; margin-top:0.7rem;"><strong>Impact:</strong> increases hazard detection complexity; design guideline is to minimize side effects.</p>
+        </div>
+
+        <!-- exam point -->
+        <div class="exam-point">
+            <div class="header">
+                <div class="shield">📌 KEY EXAM POINTS</div>
+            </div>
+            <div class="rows">
+                <div><span class="hl">RAW</span> is the most common data hazard in a basic 5-stage pipeline.</div>
+                <div><span class="hl">WAW &amp; WAR</span> only occur in out-of-order pipelines.</div>
+                <div><span class="hl">Forwarding</span> resolves most RAW hazards without stalling.</div>
+                <div><span class="hl">Load-Use hazard</span> requires one stall cycle even with forwarding.</div>
+                <div><span class="hl">Compiler scheduling</span> (NOPs, reordering) is the software solution.</div>
+            </div>
+        </div>
+
+        <!-- subtle divider (styling only) -->
+        <div class="divider"></div>
+    </div>
+</body>
+</html>

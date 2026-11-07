@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Concepts of Pipelining · Exam Notes</title>
+    <style>
+        /* Blue & White theme — clean, exam-ready */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2rem 2.2rem 2.4rem;
+            transition: all 0.2s;
+        }
+
+        /* accent bar */
+        .note-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.45rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .story {
+            background: #e9f2ff;
+            border-left: 8px solid #1a6eff;
+            padding: 1.2rem 1.7rem;
+            border-radius: 0 18px 18px 0;
+            margin: 1.5rem 0 1.8rem 0;
+            font-weight: 500;
+            font-size: 1.07rem;
+            line-height: 1.6;
+            color: #0040a0;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.08);
+            transition: 0.1s;
+        }
+
+        .story strong {
+            color: #002b6b;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00337a;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #b8d6ff 20%, #ffffff 100%);
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b4b9e;
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 i {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0047b3;
+        }
+
+        /* term list styling */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid #d0e3ff;
+            transition: 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 80, 180, 0.03);
+        }
+
+        .term-item:hover {
+            background: #edf5ff;
+            border-color: #97c1ff;
+        }
+
+        .term-badge {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            min-width: 130px;
+            text-align: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .term-def {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #002856;
+            font-weight: 450;
+        }
+
+        .term-def strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* key points card */
+        .key-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.2rem 1.5rem 1.4rem;
+            border: 2px solid #c2dbff;
+            box-shadow: 0 10px 20px -10px #003b8f33;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .key-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.5rem;
+        }
+
+        .key-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .key-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .key-card ul li strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* stage flow diagram */
+        .stage-flow {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0 0.6rem;
+        }
+
+        .stage-box {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.1rem;
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        .stage-box.alt {
+            background: #e9f2ff;
+            color: #0047b3;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.08);
+        }
+
+        .buffer-pill {
+            background: #d6e8ff;
+            color: #00337a;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid #a9c9ff;
+            box-shadow: 0 2px 6px rgba(0, 80, 200, 0.08);
+        }
+
+        .flow-arrow {
+            color: #1a6eff;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        /* stage list grid */
+        .stage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 1rem;
+            margin: 1.2rem 0 1.2rem;
+        }
+
+        .stage-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 6px 14px -8px rgba(0, 80, 200, 0.2);
+            transition: all 0.15s ease;
+        }
+
+        .stage-card:hover {
+            border-color: #1a6eff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -10px #1a6eff66;
+        }
+
+        .stage-card h4 {
+            font-size: 1.02rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+
+        .stage-card p {
+            font-size: 0.91rem;
+            line-height: 1.45;
+            color: #003174;
+        }
+
+        .stage-card .abbr {
+            display: inline-block;
+            background: #1a6eff;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            border-radius: 30px;
+            margin-right: 5px;
+            letter-spacing: 0.3px;
+        }
+
+        /* buffer table */
+        .buffer-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+            margin: 1rem 0 0.6rem;
+        }
+
+        .buffer-table th {
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #00337a;
+            padding: 0.55rem 1rem;
+            background: #e9f2ff;
+            border-radius: 12px;
+        }
+
+        .buffer-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .buffer-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .buffer-table td {
+            background: #ffffff;
+            padding: 0.7rem 1rem;
+            font-size: 0.92rem;
+            color: #003174;
+            border-top: 1px solid #e3efff;
+            border-bottom: 1px solid #e3efff;
+        }
+
+        .buffer-table td:first-child {
+            border-left: 1px solid #e3efff;
+            border-radius: 12px 0 0 12px;
+            font-weight: 700;
+            color: #003b8f;
+        }
+
+        .buffer-table td:last-child {
+            border-right: 1px solid #e3efff;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .buffer-table tr:hover td {
+            background: #f4f9ff;
+        }
+
+        /* cache benefit list */
+        .benefit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin: 1rem 0 0.8rem;
+        }
+
+        .benefit-item {
+            background: #f9fcff;
+            padding: 0.75rem 1.2rem;
+            border-radius: 14px;
+            border-left: 6px solid #1a6eff;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            box-shadow: 0 3px 8px rgba(0, 60, 140, 0.04);
+        }
+
+        .benefit-item strong {
+            color: #003b8f;
+        }
+
+        /* exam point card */
+        .exam-point {
+            background: #003b8f;
+            color: white;
+            border-radius: 22px;
+            padding: 1.4rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 16px 28px -12px #003b8f99,
+                        inset 0 1px 0 #ffffff40;
+            border: 1px solid #7fb3ff;
+        }
+
+        .exam-point .header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-point .shield {
+            background: #ffffff20;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #b8d6ff;
+            border: 1px solid #8bb8ff;
+        }
+
+        .exam-point .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.02rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: white;
+        }
+
+        .exam-point .rows span.hl {
+            background: #ffd966;
+            color: #003b8f;
+            padding: 0.1rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* small divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, #c2dbff, #ffffff);
+            margin: 1.8rem 0 0.5rem;
+        }
+
+        /* responsive fine-tune */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .note-card {
+                padding: 1.6rem 1.2rem 1.8rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .story {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            .term-item {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            .term-badge {
+                min-width: auto;
+                align-self: flex-start;
+            }
+            .exam-point {
+                padding: 1.3rem 1.5rem;
+            }
+            .exam-point .rows {
+                font-size: 0.95rem;
+            }
+            .buffer-table th,
+            .buffer-table td {
+                padding: 0.5rem 0.7rem;
+                font-size: 0.82rem;
+            }
+            .stage-flow {
+                gap: 0.4rem;
+            }
+            .stage-box {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.82rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="note-card">
+        <h1>📝 Basic Concepts of Pipelining <span>Topic 1</span></h1>
+
+        <!-- 1-sentence story -->
+        <div class="story">
+            <strong>The 1-Sentence Story:</strong> Pipelining is a technique that overlaps the execution of multiple instructions by dividing instruction processing into distinct stages, allowing different hardware units to work on different instructions simultaneously to increase throughput.
+        </div>
+
+        <!-- definitions -->
+        <h2>📌 Definitions &amp; Key Terms</h2>
+        <div class="terms-grid">
+            <div class="term-item">
+                <div class="term-badge">Pipelining</div>
+                <div class="term-def">A technique where multiple instructions are overlapped in execution by dividing the instruction cycle into distinct stages, each handled by a dedicated hardware unit.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Throughput</div>
+                <div class="term-def">The number of instructions completed per unit of time. <strong>(Pipelining increases throughput)</strong>.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Latency</div>
+                <div class="term-def">The time taken to complete a single instruction. <strong>(Pipelining does NOT reduce latency)</strong>.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Interstage Buffer</div>
+                <div class="term-def">A clocked buffer placed between pipeline stages to hold intermediate results and synchronize data flow.</div>
+            </div>
+        </div>
+
+        <!-- core idea analogy -->
+        <h2>🏭 The Core Idea <i>(Assembly Line Analogy)</i></h2>
+        <div class="key-card">
+            <h4>🔹 Overlapping Execution</h4>
+            <ul>
+                <li>Just as a car assembly line has stations (chassis, body, engine) working on different cars simultaneously, a pipelined processor has stages (Fetch, Decode, Execute, Write-back) working on different instructions simultaneously.</li>
+                <li>A new instruction completes every clock cycle after the pipeline is full.</li>
+            </ul>
+        </div>
+
+        <!-- two-stage pipeline -->
+        <h2>🔹 Two-Stage Pipeline</h2>
+        <div class="stage-flow">
+            <span class="stage-box">IFU</span>
+            <span class="flow-arrow">→</span>
+            <span class="buffer-pill">B₁</span>
+            <span class="flow-arrow">→</span>
+            <span class="stage-box">EU</span>
+        </div>
+        <div class="stage-grid">
+            <div class="stage-card">
+                <h4><span class="abbr">IFU</span> Instruction Fetch Unit</h4>
+                <p>Fetches the instruction from memory.</p>
+            </div>
+            <div class="stage-card">
+                <h4><span class="abbr">B₁</span> Buffer</h4>
+                <p>Stores the fetched instruction while the EU processes the previous one.</p>
+            </div>
+            <div class="stage-card">
+                <h4><span class="abbr">EU</span> Execution Unit</h4>
+                <p>Executes the fetched instruction.</p>
+            </div>
+        </div>
+        <div class="key-card" style="margin-top: 0.2rem;">
+            <ul>
+                <li><strong>Fetch and Execute operate in parallel.</strong></li>
+            </ul>
+        </div>
+
+        <!-- four-stage pipeline -->
+        <h2>🔹 Four-Stage Pipeline <i>(F, D, E, W)</i></h2>
+        <div class="stage-flow">
+            <span class="stage-box">F</span>
+            <span class="flow-arrow">→</span>
+            <span class="stage-box alt">D</span>
+            <span class="flow-arrow">→</span>
+            <span class="stage-box">E</span>
+            <span class="flow-arrow">→</span>
+            <span class="stage-box alt">W</span>
+        </div>
+        <div class="stage-grid">
+            <div class="stage-card">
+                <h4><span class="abbr">F</span> Fetch</h4>
+                <p>Read instruction from memory.</p>
+            </div>
+            <div class="stage-card">
+                <h4><span class="abbr">D</span> Decode</h4>
+                <p>Decode instruction and fetch operands.</p>
+            </div>
+            <div class="stage-card">
+                <h4><span class="abbr">E</span> Execute</h4>
+                <p>Perform the operation (ALU).</p>
+            </div>
+            <div class="stage-card">
+                <h4><span class="abbr">W</span> Write-back</h4>
+                <p>Store the result to the register file.</p>
+            </div>
+        </div>
+        <div class="key-card" style="margin-top: 0.2rem;">
+            <ul>
+                <li>At any time, <strong>4 instructions are in different stages</strong>.</li>
+                <li>One instruction completes per clock cycle after the pipeline is full.</li>
+            </ul>
+        </div>
+
+        <!-- interstage buffers -->
+        <h2>🧩 Interstage Buffers <i>(Data Flow)</i></h2>
+        <table class="buffer-table">
+            <thead>
+                <tr>
+                    <th>Buffer</th>
+                    <th>Stage Transition</th>
+                    <th>Contents</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>B₁</td>
+                    <td>F → D</td>
+                    <td>Holds the fetched instruction.</td>
+                </tr>
+                <tr>
+                    <td>B₂</td>
+                    <td>D → E</td>
+                    <td>Holds decoded operands and operation information.</td>
+                </tr>
+                <tr>
+                    <td>B₃</td>
+                    <td>E → W</td>
+                    <td>Holds the result and destination register information.</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="key-card" style="margin-top: 0.2rem;">
+            <h4>🔹 Why Needed?</h4>
+            <ul>
+                <li>To synchronize stages.</li>
+                <li>Hold intermediate data.</li>
+                <li>Prevent a faster stage from overwriting data a slower stage hasn't consumed yet.</li>
+            </ul>
+        </div>
+
+        <!-- role of cache memory -->
+        <h2>⚡ Role of Cache Memory in Pipelining</h2>
+        <div class="key-card">
+            <h4>🔹 The Bottleneck Problem</h4>
+            <ul>
+                <li>Each stage should complete in one clock cycle.</li>
+                <li>Main memory is too slow for instruction fetches, which would bottleneck the pipeline.</li>
+                <li><strong>Solution:</strong> Use on-chip cache memory.</li>
+            </ul>
+        </div>
+        <div class="benefit-list">
+            <div class="benefit-item"><strong>✔ Faster instruction access.</strong></div>
+            <div class="benefit-item"><strong>✔ Uniform stage duration</strong> (all stages take roughly equal time).</div>
+            <div class="benefit-item"><strong>✔ Shorter clock cycles.</strong></div>
+        </div>
+
+        <!-- exam point -->
+        <div class="exam-point">
+            <div class="header">
+                <div class="shield">📌 KEY EXAM POINT</div>
+            </div>
+            <div class="rows">
+                <div><span class="hl">Pipelining improves throughput, not latency.</span></div>
+                <div><span class="hl">Clock period</span> must accommodate the slowest pipeline stage.</div>
+                <div><span class="hl">Without cache,</span> the Fetch stage would be bottlenecked by slow main memory, making pipelining ineffective.</div>
+            </div>
+        </div>
+
+        <!-- subtle divider (styling only) -->
+        <div class="divider"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Coherence Problem &amp; Solutions · Exam Notes</title>
+    <style>
+        /* Blue & White theme — clean, exam-ready */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2rem 2.2rem 2.4rem;
+            transition: all 0.2s;
+        }
+
+        /* accent bar */
+        .note-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.45rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .story {
+            background: #e9f2ff;
+            border-left: 8px solid #1a6eff;
+            padding: 1.2rem 1.7rem;
+            border-radius: 0 18px 18px 0;
+            margin: 1.5rem 0 1.8rem 0;
+            font-weight: 500;
+            font-size: 1.07rem;
+            line-height: 1.6;
+            color: #0040a0;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.08);
+            transition: 0.1s;
+        }
+
+        .story strong {
+            color: #002b6b;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00337a;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #b8d6ff 20%, #ffffff 100%);
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b4b9e;
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 i {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0047b3;
+        }
+
+        /* term list styling */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid #d0e3ff;
+            transition: 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 80, 180, 0.03);
+        }
+
+        .term-item:hover {
+            background: #edf5ff;
+            border-color: #97c1ff;
+        }
+
+        .term-badge {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            min-width: 140px;
+            text-align: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .term-def {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #002856;
+            font-weight: 450;
+        }
+
+        .term-def strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* key points card */
+        .key-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.2rem 1.5rem 1.4rem;
+            border: 2px solid #c2dbff;
+            box-shadow: 0 10px 20px -10px #003b8f33;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .key-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.5rem;
+        }
+
+        .key-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .key-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .key-card ul li strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* example card (coherence problem) */
+        .example-card {
+            background: #f9fcff;
+            border-radius: 18px;
+            padding: 1.1rem 1.4rem;
+            border-left: 6px solid #1a6eff;
+            margin: 1rem 0 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.04);
+        }
+
+        .example-card ol {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-left: 0;
+            counter-reset: ex-counter;
+        }
+
+        .example-card ol li {
+            font-size: 0.94rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.9rem;
+            position: relative;
+            counter-increment: ex-counter;
+        }
+
+        .example-card ol li::before {
+            content: counter(ex-counter) ".";
+            position: absolute;
+            left: 0;
+            color: #1a6eff;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .example-card .fix {
+            background: #e3f7e8;
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            margin-top: 0.8rem;
+            font-size: 0.92rem;
+            color: #006633;
+            font-weight: 600;
+            border: 1px solid #b8e6c4;
+        }
+
+        /* protocol comparison grid */
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .protocol-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.25rem 1.4rem 1.4rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 10px 20px -10px #003b8f2a;
+            transition: 0.15s ease;
+        }
+
+        .protocol-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 26px -10px #1a6eff55;
+        }
+
+        .protocol-card.snoopy {
+            border-top: 6px solid #1a6eff;
+        }
+
+        .protocol-card.directory {
+            border-top: 6px solid #7c4dff;
+        }
+
+        .protocol-card h4 {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .protocol-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .protocol-card ul li {
+            font-size: 0.91rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.3rem;
+            position: relative;
+        }
+
+        .protocol-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1rem;
+        }
+
+        .protocol-card.directory ul li::before {
+            color: #7c4dff;
+        }
+
+        .protocol-card ul li strong {
+            color: #003b8f;
+            font-weight: 600;
+        }
+
+        /* MESI state table */
+        .mesi-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 7px;
+            margin: 1.2rem 0 1rem;
+        }
+
+        .mesi-table th {
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #00337a;
+            padding: 0.6rem 1rem;
+            background: #e9f2ff;
+            border-radius: 12px;
+        }
+
+        .mesi-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .mesi-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .mesi-table td {
+            background: #ffffff;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: #003174;
+            border-top: 1px solid #e3efff;
+            border-bottom: 1px solid #e3efff;
+            line-height: 1.45;
+        }
+
+        .mesi-table td:first-child {
+            border-left: 1px solid #e3efff;
+            border-radius: 12px 0 0 12px;
+            font-weight: 700;
+        }
+
+        .mesi-table td:last-child {
+            border-right: 1px solid #e3efff;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .mesi-table tr:hover td {
+            background: #f4f9ff;
+        }
+
+        .mesi-table .state-badge {
+            display: inline-block;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+        }
+
+        .state-badge.m { background: #ffe0e0; color: #b33a3a; border: 1px solid #f5b8b8; }
+        .state-badge.e { background: #e3f7e8; color: #006633; border: 1px solid #b8e6c4; }
+        .state-badge.s { background: #e9f2ff; color: #0047b3; border: 1px solid #c2dbff; }
+        .state-badge.i { background: #f0f0f0; color: #666; border: 1px solid #d4d4d4; }
+
+        /* transition grid */
+        .transition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.1rem;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .transition-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 1rem 1.2rem 1.1rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 6px 14px -8px rgba(0, 80, 200, 0.2);
+            transition: all 0.15s ease;
+        }
+
+        .transition-card:hover {
+            border-color: #1a6eff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -10px #1a6eff66;
+        }
+
+        .transition-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .transition-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .transition-card ul li {
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: #003174;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .transition-card ul li::before {
+            content: '→';
+            color: #1a6eff;
+            font-weight: 700;
+            position: absolute;
+            left: 0;
+            font-size: 0.95rem;
+        }
+
+        .transition-card ul li strong {
+            color: #003b8f;
+            font-weight: 600;
+        }
+
+        /* rules highlight */
+        .rules-highlight {
+            background: #f0f7ff;
+            border-radius: 18px;
+            padding: 1.1rem 1.5rem;
+            margin: 1rem 0 1.1rem;
+            border: 1px dashed #7fb3ff;
+            box-shadow: 0 4px 10px rgba(0, 80, 200, 0.05);
+            font-weight: 500;
+            color: #00337a;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .rules-highlight strong {
+            color: #003b8f;
+        }
+
+        .rules-highlight .valid {
+            color: #006633;
+            font-weight: 600;
+        }
+
+        .rules-highlight .invalid {
+            color: #b33a3a;
+            font-weight: 600;
+        }
+
+        /* exam point card */
+        .exam-point {
+            background: #003b8f;
+            color: white;
+            border-radius: 22px;
+            padding: 1.4rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 16px 28px -12px #003b8f99,
+                        inset 0 1px 0 #ffffff40;
+            border: 1px solid #7fb3ff;
+        }
+
+        .exam-point .header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-point .shield {
+            background: #ffffff20;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #b8d6ff;
+            border: 1px solid #8bb8ff;
+        }
+
+        .exam-point .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.02rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: white;
+        }
+
+        .exam-point .rows span.hl {
+            background: #ffd966;
+            color: #003b8f;
+            padding: 0.1rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* small divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, #c2dbff, #ffffff);
+            margin: 1.8rem 0 0.5rem;
+        }
+
+        /* responsive fine-tune */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .note-card {
+                padding: 1.6rem 1.2rem 1.8rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .story {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            .term-item {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            .term-badge {
+                min-width: auto;
+                align-self: flex-start;
+            }
+            .exam-point {
+                padding: 1.3rem 1.5rem;
+            }
+            .exam-point .rows {
+                font-size: 0.95rem;
+            }
+            .protocol-grid,
+            .transition-grid {
+                grid-template-columns: 1fr;
+            }
+            .mesi-table th,
+            .mesi-table td {
+                padding: 0.5rem 0.7rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="note-card">
+        <h1>📝 Cache Coherence Problem &amp; Solutions <span>Topic 8</span></h1>
+
+        <!-- 1-sentence story -->
+        <div class="story">
+            <strong>The 1-Sentence Story:</strong> Cache coherence ensures that all processors in a multiprocessor system observe a consistent value for shared memory, solved through software analysis, snoopy protocols (broadcast), directory protocols (targeted messages), and the MESI state-based protocol.
+        </div>
+
+        <!-- definitions -->
+        <h2>📌 Definitions &amp; Key Terms</h2>
+        <div class="terms-grid">
+            <div class="term-item">
+                <div class="term-badge">Cache Coherence Problem</div>
+                <div class="term-def">In a multiprocessor with private caches, the same memory block may be copied into several caches; a local write can make other copies stale. All processors must observe a consistent value.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Write-Back</div>
+                <div class="term-def">Write updates only the local cache; main memory is updated later upon eviction. (Causes stale copies in other caches).</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Write-Through</div>
+                <div class="term-def">Write updates both cache and main memory. (Main memory is current, but other caches may still hold stale copies).</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Snoopy Protocol</div>
+                <div class="term-def">Each cache controller continuously watches (snoops) the shared bus for writes to addresses it holds.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Directory Protocol</div>
+                <div class="term-def">A central directory tracks which caches hold which memory blocks; targeted messages are sent only to relevant caches.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">MESI Protocol</div>
+                <div class="term-def">A 4-state write-invalidate snoopy coherence protocol (Modified, Exclusive, Shared, Invalid).</div>
+            </div>
+        </div>
+
+        <!-- coherence problem example -->
+        <h2>⚠️ The Coherence Problem <i>(Example)</i></h2>
+        <div class="example-card">
+            <ol>
+                <li>P1 and P2 both read X = 10 (both caches have X = 10).</li>
+                <li>P1 writes X = 20 to its cache.</li>
+                <li>P2 reads its cached X and gets 10 (stale value).</li>
+            </ol>
+            <div class="fix">✔ Fix: Invalidate or update other cached copies whenever a shared line is modified.</div>
+        </div>
+
+        <!-- write policies -->
+        <h2>✍️ Write Policies and Coherence</h2>
+        <div class="key-card">
+            <h4>🔹 Key Distinction</h4>
+            <ul>
+                <li><strong>Write-Back:</strong> local cache updated; memory updated later. Other caches may hold stale copies.</li>
+                <li><strong>Write-Through:</strong> cache and memory updated together. But other caches may still retain old copies; notification/snooping is still required.</li>
+                <li><strong>Key Distinction:</strong> write policy determines when memory is updated; coherence protocol determines which cached copies remain valid.</li>
+            </ul>
+        </div>
+
+        <!-- software-based coherence -->
+        <h2>💻 Software-Based Coherence</h2>
+        <div class="key-card">
+            <h4>🔹 Compiler / OS Analysis</h4>
+            <ul>
+                <li>Compiler/OS analyzes shared data and marks unsafe data non-cacheable or inserts coherence operations.</li>
+                <li><strong>Advantage:</strong> less special hardware.</li>
+                <li><strong>Limitation:</strong> conservative static analysis may unnecessarily disable caching (reduces performance).</li>
+            </ul>
+        </div>
+
+        <!-- hardware solutions: snoopy vs directory -->
+        <h2>🔧 Hardware Solutions</h2>
+        <div class="protocol-grid">
+
+            <div class="protocol-card snoopy">
+                <h4>📡 Snoopy Protocol</h4>
+                <ul>
+                    <li>Cache controllers watch the bus for writes to addresses they hold.</li>
+                    <li><strong>Write-Invalidate:</strong> writer invalidates other copies before writing (more common; basis of MESI).</li>
+                    <li><strong>Write-Update:</strong> writer broadcasts updated data to all caches (more traffic).</li>
+                    <li><strong>Assumption:</strong> global bus where all communication is visible to all.</li>
+                    <li><strong>Limitation:</strong> does not scale (broadcast traffic consumes bus bandwidth).</li>
+                </ul>
+            </div>
+
+            <div class="protocol-card directory">
+                <h4>📂 Directory Protocol</h4>
+                <ul>
+                    <li>Central (or distributed) directory tracks which caches hold each memory block.</li>
+                    <li>Requests/invalidations sent as point-to-point messages only to relevant caches.</li>
+                    <li><strong>Exclusive-Write Sequence:</strong> Request → Directory identifies holders → Invalidations sent → Acks received → Exclusive access granted.</li>
+                    <li><strong>Advantages:</strong> avoids broadcast; scales to large systems.</li>
+                    <li><strong>Disadvantages:</strong> directory storage overhead; message-management overhead; possible directory contention.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MESI protocol -->
+        <h2>🔄 MESI Protocol <i>(4 States)</i></h2>
+        <table class="mesi-table">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Meaning</th>
+                    <th>Memory</th>
+                    <th>Other Caches</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="state-badge m">M (Modified)</span></td>
+                    <td>Valid, locally modified (dirty)</td>
+                    <td>Out of date</td>
+                    <td>No other valid copies</td>
+                </tr>
+                <tr>
+                    <td><span class="state-badge e">E (Exclusive)</span></td>
+                    <td>Valid, clean</td>
+                    <td>Up to date</td>
+                    <td>No other valid copies</td>
+                </tr>
+                <tr>
+                    <td><span class="state-badge s">S (Shared)</span></td>
+                    <td>Valid, clean</td>
+                    <td>Up to date</td>
+                    <td>May exist in other caches</td>
+                </tr>
+                <tr>
+                    <td><span class="state-badge i">I (Invalid)</span></td>
+                    <td>Not valid</td>
+                    <td>—</td>
+                    <td>May exist elsewhere</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- MESI local transitions -->
+        <h2>🔹 MESI Local Transitions</h2>
+        <div class="transition-grid">
+            <div class="transition-card">
+                <h4>Reads</h4>
+                <ul>
+                    <li><strong>Read Hit in M/E/S:</strong> return local data.</li>
+                    <li><strong>Read Miss in I:</strong> fetch; enter E (no other copies) or S (others have it).</li>
+                </ul>
+            </div>
+            <div class="transition-card">
+                <h4>Writes</h4>
+                <ul>
+                    <li><strong>Write Hit in M:</strong> remain M.</li>
+                    <li><strong>Write Hit in E:</strong> → M without bus invalidation.</li>
+                    <li><strong>Write Hit in S:</strong> issue invalidate, then → M.</li>
+                    <li><strong>Write Miss in I:</strong> acquire exclusive ownership, then → M.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MESI bus-snooped transitions -->
+        <h2>🔹 MESI Bus-Snooped Transitions</h2>
+        <div class="transition-grid">
+            <div class="transition-card">
+                <h4>Another Processor Reads</h4>
+                <ul>
+                    <li><strong>E → S</strong></li>
+                    <li><strong>M → S</strong> (supply/write-back modified data first)</li>
+                    <li><strong>S stays S</strong></li>
+                </ul>
+            </div>
+            <div class="transition-card">
+                <h4>Another Processor Requests Ownership</h4>
+                <ul>
+                    <li><strong>E → I</strong></li>
+                    <li><strong>S → I</strong></li>
+                    <li><strong>M → I</strong> (after supplying modified data)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- key rules -->
+        <h2>📏 Key Rules</h2>
+        <div class="rules-highlight">
+            <div>• Only <strong>one cache</strong> can hold a line in <strong>M or E</strong> state.</div>
+            <div>• <strong>Several caches</strong> can hold a line in <strong>S</strong> state.</div>
+            <div style="margin-top:0.5rem;">✅ <span class="valid">Valid combinations:</span> One M + all I; One E + all I; One or more S + others I; All I.</div>
+            <div>❌ <span class="invalid">Invalid combinations:</span> Two M's; M + S; E + S; E + E.</div>
+        </div>
+
+        <!-- exam point -->
+        <div class="exam-point">
+            <div class="header">
+                <div class="shield">📌 KEY EXAM POINTS</div>
+            </div>
+            <div class="rows">
+                <div><span class="hl">Snoopy</span> is natural for bus-based SMPs (broadcast is easy).</div>
+                <div><span class="hl">Directory</span> scales better for large systems (targeted messages).</div>
+                <div><span class="hl">MESI</span> uses 2 status bits per cache line to encode 4 states.</div>
+                <div><span class="hl">E → M</span> is cheaper than <span class="hl">S → M</span> (no invalidation needed).</div>
+                <div><span class="hl">When another processor reads an M line,</span> the modified data must be made available (owner typically transitions M → S).</div>
+            </div>
+        </div>
+
+        <!-- subtle divider (styling only) -->
+        <div class="divider"></div>
+    </div>
+</body>
+</html>

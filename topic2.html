@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline Performance Metrics · Exam Notes</title>
+    <style>
+        /* Blue & White theme — clean, exam-ready */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2rem 2.2rem 2.4rem;
+            transition: all 0.2s;
+        }
+
+        /* accent bar */
+        .note-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.45rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .story {
+            background: #e9f2ff;
+            border-left: 8px solid #1a6eff;
+            padding: 1.2rem 1.7rem;
+            border-radius: 0 18px 18px 0;
+            margin: 1.5rem 0 1.8rem 0;
+            font-weight: 500;
+            font-size: 1.07rem;
+            line-height: 1.6;
+            color: #0040a0;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.08);
+            transition: 0.1s;
+        }
+
+        .story strong {
+            color: #002b6b;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00337a;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #b8d6ff 20%, #ffffff 100%);
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b4b9e;
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 i {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0047b3;
+        }
+
+        /* term list styling */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid #d0e3ff;
+            transition: 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 80, 180, 0.03);
+        }
+
+        .term-item:hover {
+            background: #edf5ff;
+            border-color: #97c1ff;
+        }
+
+        .term-badge {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            min-width: 110px;
+            text-align: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .term-def {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #002856;
+            font-weight: 450;
+        }
+
+        .term-def strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* formula block */
+        .formula-block {
+            background: #f0f7ff;
+            border-radius: 18px;
+            padding: 1.1rem 1.5rem;
+            margin: 0.9rem 0 1rem;
+            border: 1px dashed #7fb3ff;
+            font-weight: 600;
+            color: #00337a;
+            font-size: 1rem;
+            line-height: 1.9;
+            box-shadow: 0 4px 10px rgba(0, 80, 200, 0.05);
+        }
+
+        .formula-block .label {
+            display: inline-block;
+            background: #1a6eff;
+            color: white;
+            padding: 0.12rem 0.75rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            margin-right: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .formula-block .sub {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #4a6f9e;
+            margin-top: 0.25rem;
+        }
+
+        .formula-block em {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.05rem 0.45rem;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #003b8f;
+        }
+
+        /* key points card */
+        .key-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.2rem 1.5rem 1.4rem;
+            border: 2px solid #c2dbff;
+            box-shadow: 0 10px 20px -10px #003b8f33;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .key-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.5rem;
+        }
+
+        .key-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .key-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .key-card ul li strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* ideal vs real grid */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.1rem;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .compare-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.2rem 1.3rem 1.3rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 8px 18px -10px #003b8f2a;
+            transition: 0.15s ease;
+        }
+
+        .compare-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px -10px #1a6eff55;
+        }
+
+        .compare-card.ideal {
+            border-top: 6px solid #1a6eff;
+        }
+
+        .compare-card.real {
+            border-top: 6px solid #d4a017;
+        }
+
+        .compare-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compare-card.ideal h4 {
+            color: #003b8f;
+        }
+
+        .compare-card.real h4 {
+            color: #7a5600;
+        }
+
+        .compare-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .compare-card ul li {
+            font-size: 0.92rem;
+            line-height: 1.45;
+            color: #003174;
+            padding-left: 1.3rem;
+            position: relative;
+        }
+
+        .compare-card ul li::before {
+            content: '•';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.15rem;
+        }
+
+        .compare-card.real ul li::before {
+            color: #d4a017;
+        }
+
+        /* exam point card */
+        .exam-point {
+            background: #003b8f;
+            color: white;
+            border-radius: 22px;
+            padding: 1.4rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 16px 28px -12px #003b8f99,
+                        inset 0 1px 0 #ffffff40;
+            border: 1px solid #7fb3ff;
+        }
+
+        .exam-point .header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-point .shield {
+            background: #ffffff20;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #b8d6ff;
+            border: 1px solid #8bb8ff;
+        }
+
+        .exam-point .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.02rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: white;
+        }
+
+        .exam-point .rows span.hl {
+            background: #ffd966;
+            color: #003b8f;
+            padding: 0.1rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* small divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, #c2dbff, #ffffff);
+            margin: 1.8rem 0 0.5rem;
+        }
+
+        /* responsive fine-tune */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .note-card {
+                padding: 1.6rem 1.2rem 1.8rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .story {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            .term-item {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            .term-badge {
+                min-width: auto;
+                align-self: flex-start;
+            }
+            .exam-point {
+                padding: 1.3rem 1.5rem;
+            }
+            .exam-point .rows {
+                font-size: 0.95rem;
+            }
+            .formula-block {
+                padding: 0.9rem 1rem;
+                font-size: 0.92rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="note-card">
+        <h1>📝 Pipeline Performance Metrics <span>Topic 2</span></h1>
+
+        <!-- 1-sentence story -->
+        <div class="story">
+            <strong>The 1-Sentence Story:</strong> Pipeline performance is measured by throughput (instructions completed per unit time), speedup (ratio of non-pipelined to pipelined time), and efficiency (utilization of pipeline stages), with ideal speedup approaching the number of stages <em>k</em> for large <em>n</em>.
+        </div>
+
+        <!-- definitions -->
+        <h2>📌 Definitions &amp; Key Terms</h2>
+        <div class="terms-grid">
+            <div class="term-item">
+                <div class="term-badge">Throughput (TP)</div>
+                <div class="term-def">Number of instructions completed per unit time. <strong>TP = n / T<sub>p</sub></strong>.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Latency (L)</div>
+                <div class="term-def">Time taken to complete a single instruction. <strong>Pipelining does not reduce latency.</strong></div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Speedup (S)</div>
+                <div class="term-def">Ratio of sequential (non-pipelined) time to pipelined time. <strong>S = T<sub>n</sub> / T<sub>p</sub></strong>.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Efficiency (E)</div>
+                <div class="term-def">Utilization of all pipeline stages. <strong>E = S / k</strong>.</div>
+            </div>
+        </div>
+
+        <!-- key formulas -->
+        <h2>🧮 Key Formulas</h2>
+
+        <h3>🔹 Non-Pipelined Time</h3>
+        <div class="formula-block">
+            <span class="label">T<sub>n</sub></span> T<sub>n</sub> = n × t<sub>n</sub>
+        </div>
+
+        <h3>🔹 Pipelined Time <i>(k stages)</i></h3>
+        <div class="formula-block">
+            <span class="label">T<sub>p</sub></span> T<sub>p</sub> = [ k + (n − 1) ] × t<sub>p</sub>
+            <span class="sub"><em>k</em> = number of stages &nbsp;·&nbsp; <em>n</em> = number of instructions &nbsp;·&nbsp; <em>t<sub>p</sub></em> = clock period per stage</span>
+        </div>
+        <div class="key-card" style="margin-top: 0.2rem;">
+            <ul>
+                <li>The first instruction takes <strong>k cycles</strong> to fill the pipeline.</li>
+                <li>Each subsequent instruction takes <strong>1 additional cycle</strong>.</li>
+            </ul>
+        </div>
+
+        <h3>🔹 Speedup</h3>
+        <div class="formula-block">
+            <span class="label">S</span> S = T<sub>n</sub> / T<sub>p</sub> = [ n × t<sub>n</sub> ] / [ (k + (n − 1)) × t<sub>p</sub> ]
+        </div>
+
+        <h3>🔹 Ideal Speedup <i>(assuming t<sub>n</sub> = k × t<sub>p</sub>)</i></h3>
+        <div class="formula-block">
+            <span class="label">S ideal</span> S = n·k / (k + n − 1)
+            <span class="sub">For large <em>n</em>: <strong>S ≈ k</strong> (speedup approaches the number of stages).</span>
+        </div>
+
+        <h3>🔹 Efficiency</h3>
+        <div class="formula-block">
+            <span class="label">E</span> E = S / k = n / (k + n − 1)
+            <span class="sub">For large <em>n</em>: <strong>E → 1</strong> (100% utilization).</span>
+        </div>
+
+        <!-- ideal vs real speedup -->
+        <h2>⚖️ Ideal vs. Real Speedup</h2>
+        <div class="compare-grid">
+            <div class="compare-card ideal">
+                <h4>✨ Ideal Speedup</h4>
+                <ul>
+                    <li><strong>S = k</strong></li>
+                    <li>Achieved only if all stages take equal time.</li>
+                    <li>And there are no hazards.</li>
+                </ul>
+            </div>
+            <div class="compare-card real">
+                <h4>⚠️ Real Speedup</h4>
+                <ul>
+                    <li><strong>S &lt; k</strong></li>
+                    <li>Due to pipeline hazards (structural, data, control).</li>
+                    <li>Stage imbalance (faster stages wait for the slowest stage).</li>
+                    <li>Pipeline fill/drain time.</li>
+                    <li>Overhead (clock skew, buffer delays).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- exam point -->
+        <div class="exam-point">
+            <div class="header">
+                <div class="shield">📌 KEY EXAM POINTS</div>
+            </div>
+            <div class="rows">
+                <div><span class="hl">Pipelining improves throughput, not latency.</span></div>
+                <div><span class="hl">Maximum speedup = number of stages k.</span></div>
+                <div><span class="hl">Real speedup</span> is always less than ideal due to hazards and stage imbalance.</div>
+                <div><span class="hl">Efficiency</span> tells you what percentage of the pipeline is actually doing useful work.</div>
+            </div>
+        </div>
+
+        <!-- subtle divider (styling only) -->
+        <div class="divider"></div>
+    </div>
+</body>
+</html>

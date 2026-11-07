@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphics Processing Unit (GPU) · Exam Notes</title>
+    <style>
+        /* Blue & White theme — clean, exam-ready */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2rem 2.2rem 2.4rem;
+            transition: all 0.2s;
+        }
+
+        /* accent bar */
+        .note-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.45rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .story {
+            background: #e9f2ff;
+            border-left: 8px solid #1a6eff;
+            padding: 1.2rem 1.7rem;
+            border-radius: 0 18px 18px 0;
+            margin: 1.5rem 0 1.8rem 0;
+            font-weight: 500;
+            font-size: 1.07rem;
+            line-height: 1.6;
+            color: #0040a0;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.08);
+            transition: 0.1s;
+        }
+
+        .story strong {
+            color: #002b6b;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00337a;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #b8d6ff 20%, #ffffff 100%);
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b4b9e;
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 i {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0047b3;
+        }
+
+        /* term list styling */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid #d0e3ff;
+            transition: 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 80, 180, 0.03);
+        }
+
+        .term-item:hover {
+            background: #edf5ff;
+            border-color: #97c1ff;
+        }
+
+        .term-badge {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            min-width: 140px;
+            text-align: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .term-def {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #002856;
+            font-weight: 450;
+        }
+
+        .term-def strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* comparison tables */
+        .comp-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+            margin: 1.2rem 0 1rem;
+        }
+
+        .comp-table th {
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #00337a;
+            padding: 0.6rem 1rem;
+            background: #e9f2ff;
+            border-radius: 12px;
+        }
+
+        .comp-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .comp-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .comp-table td {
+            background: #ffffff;
+            padding: 0.75rem 1rem;
+            font-size: 0.92rem;
+            color: #003174;
+            border-top: 1px solid #e3efff;
+            border-bottom: 1px solid #e3efff;
+            line-height: 1.45;
+        }
+
+        .comp-table td:first-child {
+            border-left: 1px solid #e3efff;
+            border-radius: 12px 0 0 12px;
+            font-weight: 600;
+            color: #003b8f;
+        }
+
+        .comp-table td:last-child {
+            border-right: 1px solid #e3efff;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .comp-table tr:hover td {
+            background: #f4f9ff;
+        }
+
+        /* architecture flow */
+        .arch-flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 1.2rem 0 1rem;
+        }
+
+        .arch-box {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+            letter-spacing: 0.2px;
+            text-align: center;
+        }
+
+        .arch-box.alt {
+            background: #e9f2ff;
+            color: #0047b3;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.08);
+        }
+
+        .arch-arrow {
+            color: #1a6eff;
+            font-weight: 900;
+            font-size: 1.15rem;
+        }
+
+        /* key points card */
+        .key-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.2rem 1.5rem 1.4rem;
+            border: 2px solid #c2dbff;
+            box-shadow: 0 10px 20px -10px #003b8f33;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .key-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.5rem;
+        }
+
+        .key-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .key-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .key-card ul li strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* framework / application tags */
+        .tag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 0.8rem 0 0.2rem;
+        }
+
+        .tag-pill {
+            background: #e9f2ff;
+            color: #0047b3;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.35rem 1rem;
+            border-radius: 40px;
+            border: 1px solid #c2dbff;
+            box-shadow: 0 2px 6px rgba(0, 80, 200, 0.06);
+            transition: 0.12s ease;
+        }
+
+        .tag-pill:hover {
+            background: #d6e8ff;
+            border-color: #97c1ff;
+        }
+
+        .tag-pill.framework {
+            background: #e3f7e8;
+            color: #006633;
+            border-color: #b8e6c4;
+        }
+
+        .tag-pill.framework:hover {
+            background: #d1f0da;
+        }
+
+        /* exam point card */
+        .exam-point {
+            background: #003b8f;
+            color: white;
+            border-radius: 22px;
+            padding: 1.4rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 16px 28px -12px #003b8f99,
+                        inset 0 1px 0 #ffffff40;
+            border: 1px solid #7fb3ff;
+        }
+
+        .exam-point .header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-point .shield {
+            background: #ffffff20;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #b8d6ff;
+            border: 1px solid #8bb8ff;
+        }
+
+        .exam-point .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.02rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: white;
+        }
+
+        .exam-point .rows span.hl {
+            background: #ffd966;
+            color: #003b8f;
+            padding: 0.1rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* small divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, #c2dbff, #ffffff);
+            margin: 1.8rem 0 0.5rem;
+        }
+
+        /* responsive fine-tune */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .note-card {
+                padding: 1.6rem 1.2rem 1.8rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .story {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            .term-item {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            .term-badge {
+                min-width: auto;
+                align-self: flex-start;
+            }
+            .exam-point {
+                padding: 1.3rem 1.5rem;
+            }
+            .exam-point .rows {
+                font-size: 0.95rem;
+            }
+            .comp-table th,
+            .comp-table td {
+                padding: 0.5rem 0.7rem;
+                font-size: 0.82rem;
+            }
+            .arch-flow {
+                gap: 0.4rem;
+            }
+            .arch-box {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="note-card">
+        <h1>📝 Graphics Processing Unit (GPU) <span>Topic 9</span></h1>
+
+        <!-- 1-sentence story -->
+        <div class="story">
+            <strong>The 1-Sentence Story:</strong> A GPU is a specialized, highly parallel processor designed for data-intensive tasks, using hundreds of simple ALUs and a multi-level memory hierarchy (SMs, L2 cache, DRAM) to maximize throughput rather than single-thread latency.
+        </div>
+
+        <!-- definitions -->
+        <h2>📌 Definitions &amp; Key Terms</h2>
+        <div class="terms-grid">
+            <div class="term-item">
+                <div class="term-badge">GPU</div>
+                <div class="term-def">Graphics Processing Unit: a specialized processor built for parallel computation, originally for 3D graphics, now used for AI/ML, HPC, and more.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">SM</div>
+                <div class="term-def">Streaming Multiprocessor: the core building block of a GPU, containing multiple ALUs, its own instruction scheduler, and a private L1 cache.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Data Parallelism</div>
+                <div class="term-def">Applying the same operation to many data elements simultaneously (GPU's primary strength).</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Latency Hiding</div>
+                <div class="term-def">GPUs switch to other threads while waiting for memory, keeping ALUs busy, rather than reducing memory latency.</div>
+            </div>
+        </div>
+
+        <!-- CPU vs GPU structure -->
+        <h2>⚖️ CPU vs. GPU Structure</h2>
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>CPU</th>
+                    <th>GPU</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Focus</td>
+                    <td>Low latency (single thread)</td>
+                    <td>High throughput (many threads)</td>
+                </tr>
+                <tr>
+                    <td>Control Unit</td>
+                    <td>Large, complex</td>
+                    <td>Minimal</td>
+                </tr>
+                <tr>
+                    <td>Cache</td>
+                    <td>Large</td>
+                    <td>Small</td>
+                </tr>
+                <tr>
+                    <td>ALUs</td>
+                    <td>Few, powerful</td>
+                    <td>Hundreds/thousands, simple</td>
+                </tr>
+                <tr>
+                    <td>Best For</td>
+                    <td>Complex branching, sequential code</td>
+                    <td>Data-parallel, compute-intensive tasks</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- GPU architecture fundamentals -->
+        <h2>🏗️ GPU Architecture Fundamentals</h2>
+        <div class="arch-flow">
+            <span class="arch-box">SM</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-box alt">L2 Cache</span>
+            <span class="arch-arrow">→</span>
+            <span class="arch-box">DRAM</span>
+        </div>
+        <div class="key-card">
+            <h4>🔹 Memory Hierarchy</h4>
+            <ul>
+                <li><strong>Streaming Multiprocessors (SMs):</strong> multiple SMs per GPU. Each SM has ALUs, instruction schedulers, and private L1 cache.</li>
+                <li><strong>L2 Cache:</strong> shared by all SMs. Acts as a middle layer between SMs and DRAM.</li>
+                <li><strong>DRAM:</strong> main GPU memory (high bandwidth).</li>
+                <li><strong>Data Flow:</strong> SM checks L1 → L2 → DRAM.</li>
+            </ul>
+        </div>
+        <div class="key-card" style="margin-top: 0;">
+            <h4>🔹 Execution Model</h4>
+            <ul>
+                <li><strong>SIMD within a core</strong> (many ALUs perform the same instruction).</li>
+                <li>Multi-threaded execution on a single core.</li>
+                <li><strong>Goal:</strong> maximize overall computing throughput, hide memory latency via thread switching.</li>
+            </ul>
+        </div>
+
+        <!-- discrete vs integrated GPUs -->
+        <h2>🔌 Discrete vs. Integrated GPUs</h2>
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Discrete GPU</th>
+                    <th>Integrated GPU</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Location</td>
+                    <td>Separate chip (graphics card)</td>
+                    <td>Same chip as CPU</td>
+                </tr>
+                <tr>
+                    <td>Memory</td>
+                    <td>Dedicated GPU memory (VRAM)</td>
+                    <td>Shares DRAM/LLC with CPU</td>
+                </tr>
+                <tr>
+                    <td>Connection</td>
+                    <td>PCIe bus</td>
+                    <td>On-chip interconnect</td>
+                </tr>
+                <tr>
+                    <td>Performance</td>
+                    <td>Higher</td>
+                    <td>Lower</td>
+                </tr>
+                <tr>
+                    <td>Power</td>
+                    <td>Higher consumption</td>
+                    <td>Lower consumption</td>
+                </tr>
+                <tr>
+                    <td>Data Transfer</td>
+                    <td>PCIe transfer overhead</td>
+                    <td>No PCIe transfer overhead</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- GPU programming & applications -->
+        <h2>💻 GPU Programming &amp; Applications</h2>
+        <h3>🔹 Frameworks</h3>
+        <div class="tag-group">
+            <span class="tag-pill framework">CUDA (NVIDIA)</span>
+            <span class="tag-pill framework">OpenCL</span>
+            <span class="tag-pill framework">PGI x64+GPU</span>
+        </div>
+        <h3>🔹 Applications</h3>
+        <div class="tag-group">
+            <span class="tag-pill">AI / ML</span>
+            <span class="tag-pill">Gaming</span>
+            <span class="tag-pill">Video Editing</span>
+            <span class="tag-pill">HPC</span>
+            <span class="tag-pill">Visualization &amp; Simulation</span>
+            <span class="tag-pill">Embedded systems</span>
+            <span class="tag-pill">Mobile phones</span>
+            <span class="tag-pill">Game consoles</span>
+        </div>
+
+        <!-- exam point -->
+        <div class="exam-point">
+            <div class="header">
+                <div class="shield">📌 KEY EXAM POINTS</div>
+            </div>
+            <div class="rows">
+                <div><span class="hl">GPUs are throughput-oriented;</span> CPUs are latency-oriented.</div>
+                <div><span class="hl">GPUs hide latency</span> by switching threads, not by reducing memory latency.</div>
+                <div><span class="hl">SMs are the building blocks;</span> L2 is shared; DRAM is the main memory.</div>
+                <div><span class="hl">Discrete GPUs</span> are more powerful but consume more energy; <span class="hl">integrated GPUs</span> are more power-efficient but less performant.</div>
+                <div><span class="hl">GPUs excel at</span> "embarrassingly parallel" workloads (same operation on lots of data).</div>
+            </div>
+        </div>
+
+        <!-- subtle divider (styling only) -->
+        <div class="divider"></div>
+    </div>
+</body>
+</html>

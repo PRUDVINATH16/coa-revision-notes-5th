@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallel Processors &amp; Flynn's Classification · Exam Notes</title>
+    <style>
+        /* Blue & White theme — clean, exam-ready */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .note-card {
+            background-color: #ffffff;
+            max-width: 1000px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2rem 2.2rem 2.4rem;
+            transition: all 0.2s;
+        }
+
+        /* accent bar */
+        .note-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.45rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .story {
+            background: #e9f2ff;
+            border-left: 8px solid #1a6eff;
+            padding: 1.2rem 1.7rem;
+            border-radius: 0 18px 18px 0;
+            margin: 1.5rem 0 1.8rem 0;
+            font-weight: 500;
+            font-size: 1.07rem;
+            line-height: 1.6;
+            color: #0040a0;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.08);
+            transition: 0.1s;
+        }
+
+        .story strong {
+            color: #002b6b;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #00337a;
+            margin: 2rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #b8d6ff 20%, #ffffff 100%);
+            border-radius: 2px;
+            min-width: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0b4b9e;
+            margin-top: 1.8rem;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 i {
+            font-style: normal;
+            background: #d6e8ff;
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0047b3;
+        }
+
+        /* term list styling */
+        .terms-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            background: #f9fcff;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            border: 1px solid #d0e3ff;
+            transition: 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 80, 180, 0.03);
+        }
+
+        .term-item:hover {
+            background: #edf5ff;
+            border-color: #97c1ff;
+        }
+
+        .term-badge {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            min-width: 150px;
+            text-align: center;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .term-def {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: #002856;
+            font-weight: 450;
+        }
+
+        .term-def strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* key points card */
+        .key-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.2rem 1.5rem 1.4rem;
+            border: 2px solid #c2dbff;
+            box-shadow: 0 10px 20px -10px #003b8f33;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .key-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.5rem;
+        }
+
+        .key-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .key-card ul li {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .key-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        .key-card ul li strong {
+            color: #00337a;
+            font-weight: 600;
+        }
+
+        /* levels of parallelism grid */
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .level-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 6px 14px -8px rgba(0, 80, 200, 0.2);
+            transition: all 0.15s ease;
+        }
+
+        .level-card:hover {
+            border-color: #1a6eff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -10px #1a6eff66;
+        }
+
+        .level-card .level-num {
+            display: inline-block;
+            background: #1a6eff;
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.3px;
+        }
+
+        .level-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.01em;
+        }
+
+        .level-card p {
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: #003174;
+        }
+
+        /* Flynn taxonomy table */
+        .flynn-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 7px;
+            margin: 1.2rem 0 1rem;
+        }
+
+        .flynn-table th {
+            text-align: left;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #00337a;
+            padding: 0.65rem 1rem;
+            background: #e9f2ff;
+            border-radius: 12px;
+        }
+
+        .flynn-table th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .flynn-table th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .flynn-table td {
+            background: #ffffff;
+            padding: 0.8rem 1rem;
+            font-size: 0.94rem;
+            color: #003174;
+            border-top: 1px solid #e3efff;
+            border-bottom: 1px solid #e3efff;
+            line-height: 1.45;
+        }
+
+        .flynn-table td:first-child {
+            border-left: 1px solid #e3efff;
+            border-radius: 12px 0 0 12px;
+            font-weight: 700;
+        }
+
+        .flynn-table td:last-child {
+            border-right: 1px solid #e3efff;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .flynn-table tr:hover td {
+            background: #f4f9ff;
+        }
+
+        .flynn-table .class-badge {
+            display: inline-block;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+        }
+
+        .class-badge.sisd { background: #e9f2ff; color: #0047b3; border: 1px solid #c2dbff; }
+        .class-badge.simd { background: #e3f7e8; color: #006633; border: 1px solid #b8e6c4; }
+        .class-badge.misd { background: #fff0e0; color: #8a5a00; border: 1px solid #f0dca8; }
+        .class-badge.mimd { background: #f2edff; color: #5b2bd6; border: 1px solid #d6c8ff; }
+
+        /* detailed definitions grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin: 1.2rem 0 1.4rem;
+        }
+
+        .detail-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 1.25rem 1.4rem 1.4rem;
+            border: 2px solid #b8d6ff;
+            box-shadow: 0 10px 20px -10px #003b8f2a;
+            transition: 0.15s ease;
+            position: relative;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 26px -10px #1a6eff55;
+        }
+
+        .detail-card.sisd { border-top: 6px solid #1a6eff; }
+        .detail-card.simd { border-top: 6px solid #0e9f6e; }
+        .detail-card.misd { border-top: 6px solid #d4a017; }
+        .detail-card.mimd { border-top: 6px solid #7c4dff; }
+
+        .detail-card h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #003b8f;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .detail-card ul li {
+            font-size: 0.91rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.3rem;
+            position: relative;
+        }
+
+        .detail-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1rem;
+        }
+
+        .detail-card.simd ul li::before { color: #0e9f6e; }
+        .detail-card.misd ul li::before { color: #d4a017; }
+        .detail-card.mimd ul li::before { color: #7c4dff; }
+
+        .detail-card ul li strong {
+            color: #003b8f;
+            font-weight: 600;
+        }
+
+        .detail-card .note-tag {
+            display: inline-block;
+            margin-top: 0.75rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.2rem 0.75rem;
+            border-radius: 30px;
+        }
+
+        .detail-card.sisd .note-tag { background: #e9f2ff; color: #0047b3; border: 1px solid #c2dbff; }
+        .detail-card.simd .note-tag { background: #e3f7e8; color: #006633; border: 1px solid #b8e6c4; }
+        .detail-card.misd .note-tag { background: #fff0e0; color: #8a5a00; border: 1px solid #f0dca8; }
+        .detail-card.mimd .note-tag { background: #f2edff; color: #5b2bd6; border: 1px solid #d6c8ff; }
+
+        /* why parallel card */
+        .why-card {
+            background: #f9fcff;
+            border-radius: 18px;
+            padding: 1.1rem 1.4rem;
+            border-left: 6px solid #1a6eff;
+            margin: 1rem 0 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 60, 140, 0.04);
+        }
+
+        .why-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .why-card ul li {
+            font-size: 0.94rem;
+            line-height: 1.5;
+            color: #003174;
+            padding-left: 1.4rem;
+            position: relative;
+        }
+
+        .why-card ul li::before {
+            content: '▹';
+            color: #1a6eff;
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            font-size: 1rem;
+        }
+
+        .why-card ul li strong {
+            color: #003b8f;
+            font-weight: 600;
+        }
+
+        /* exam point card */
+        .exam-point {
+            background: #003b8f;
+            color: white;
+            border-radius: 22px;
+            padding: 1.4rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 16px 28px -12px #003b8f99,
+                        inset 0 1px 0 #ffffff40;
+            border: 1px solid #7fb3ff;
+        }
+
+        .exam-point .header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-point .shield {
+            background: #ffffff20;
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: #b8d6ff;
+            border: 1px solid #8bb8ff;
+        }
+
+        .exam-point .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 1.02rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: white;
+        }
+
+        .exam-point .rows span.hl {
+            background: #ffd966;
+            color: #003b8f;
+            padding: 0.1rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* small divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, #c2dbff, #ffffff);
+            margin: 1.8rem 0 0.5rem;
+        }
+
+        /* responsive fine-tune */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .note-card {
+                padding: 1.6rem 1.2rem 1.8rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .story {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            .term-item {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+            .term-badge {
+                min-width: auto;
+                align-self: flex-start;
+            }
+            .exam-point {
+                padding: 1.3rem 1.5rem;
+            }
+            .exam-point .rows {
+                font-size: 0.95rem;
+            }
+            .flynn-table th,
+            .flynn-table td {
+                padding: 0.55rem 0.7rem;
+                font-size: 0.82rem;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="note-card">
+        <h1>📝 Parallel Processors &amp; Flynn's Classification <span>Topic 6</span></h1>
+
+        <!-- 1-sentence story -->
+        <div class="story">
+            <strong>The 1-Sentence Story:</strong> Parallel processing improves performance by executing multiple operations simultaneously, and Flynn's taxonomy classifies these systems based on whether they use single or multiple instruction and data streams (SISD, SIMD, MISD, MIMD).
+        </div>
+
+        <!-- definitions -->
+        <h2>📌 Definitions &amp; Key Terms</h2>
+        <div class="terms-grid">
+            <div class="term-item">
+                <div class="term-badge">Parallel Processing</div>
+                <div class="term-def">Execution of concurrent events to achieve faster computational speed.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Decomposition</div>
+                <div class="term-def">Partitioning a program or data into independent pieces that can run simultaneously.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Data Parallelism</div>
+                <div class="term-def">Same operation applied to different data elements simultaneously.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Task Parallelism</div>
+                <div class="term-def">Different operations applied to different data simultaneously.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Instruction Stream</div>
+                <div class="term-def">Sequence of instructions read from memory.</div>
+            </div>
+            <div class="term-item">
+                <div class="term-badge">Data Stream</div>
+                <div class="term-def">Operations performed on the data in the processor.</div>
+            </div>
+        </div>
+
+        <!-- levels of parallelism -->
+        <h2>📶 Levels of Parallelism</h2>
+        <div class="levels-grid">
+            <div class="level-card">
+                <span class="level-num">LEVEL 1</span>
+                <h4>Job / Program Level</h4>
+                <p>Multiple independent programs running simultaneously.</p>
+            </div>
+            <div class="level-card">
+                <span class="level-num">LEVEL 2</span>
+                <h4>Task / Procedure Level</h4>
+                <p>A single program divided into independent tasks.</p>
+            </div>
+            <div class="level-card">
+                <span class="level-num">LEVEL 3</span>
+                <h4>Inter-Instruction Level</h4>
+                <p>Pipelining and Superscalar execution.</p>
+            </div>
+            <div class="level-card">
+                <span class="level-num">LEVEL 4</span>
+                <h4>Intra-Instruction Level</h4>
+                <p>Micro-operations within a single instruction.</p>
+            </div>
+        </div>
+
+        <!-- why parallel processing -->
+        <h2>⚡ Why Parallel Processing?</h2>
+        <div class="why-card">
+            <ul>
+                <li><strong>Clock speed cannot keep increasing</strong> due to power consumption and heat (P ∝ V²f).</li>
+                <li>Multiple moderately clocked cores can offer <strong>higher throughput within a power budget</strong>.</li>
+            </ul>
+        </div>
+
+        <!-- Flynn's taxonomy table -->
+        <h2>📊 Flynn's Taxonomy <i>(Exam Table)</i></h2>
+        <table class="flynn-table">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Instruction Stream</th>
+                    <th>Data Stream</th>
+                    <th>Typical Organization</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="class-badge sisd">SISD</span></td>
+                    <td>Single</td>
+                    <td>Single</td>
+                    <td>Uniprocessor (von Neumann)</td>
+                </tr>
+                <tr>
+                    <td><span class="class-badge simd">SIMD</span></td>
+                    <td>Single</td>
+                    <td>Multiple</td>
+                    <td>Vector / Array processor</td>
+                </tr>
+                <tr>
+                    <td><span class="class-badge misd">MISD</span></td>
+                    <td>Multiple</td>
+                    <td>Single</td>
+                    <td>No practical commercial implementation</td>
+                </tr>
+                <tr>
+                    <td><span class="class-badge mimd">MIMD</span></td>
+                    <td>Multiple</td>
+                    <td>Multiple</td>
+                    <td>SMP, Cluster, NUMA, Multi-core</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- detailed definitions -->
+        <h2>🔍 Detailed Definitions</h2>
+        <div class="detail-grid">
+
+            <div class="detail-card sisd">
+                <h4>SISD</h4>
+                <ul>
+                    <li>Standard von Neumann machine.</li>
+                    <li>One operation at a time.</li>
+                    <li><strong>Limitation:</strong> Von Neumann bottleneck (memory bandwidth limits speed).</li>
+                </ul>
+                <span class="note-tag">Uniprocessor</span>
+            </div>
+
+            <div class="detail-card simd">
+                <h4>SIMD</h4>
+                <ul>
+                    <li>One instruction controls many processing elements.</li>
+                    <li>Processing elements act in <strong>lockstep</strong>.</li>
+                    <li>Includes vector and array processors.</li>
+                    <li><strong>Example:</strong> adding corresponding elements of two arrays (C = A + B).</li>
+                </ul>
+                <span class="note-tag">One instruction, many data</span>
+            </div>
+
+            <div class="detail-card misd">
+                <h4>MISD</h4>
+                <ul>
+                    <li>Different instruction streams on a common data stream.</li>
+                    <li><strong>No commercial implementation</strong> (theoretical only).</li>
+                    <li>Sometimes used to describe redundant fail-safe systems or pipelined processors.</li>
+                </ul>
+                <span class="note-tag">Theoretical only</span>
+            </div>
+
+            <div class="detail-card mimd">
+                <h4>MIMD</h4>
+                <ul>
+                    <li>Multiple general-purpose processors.</li>
+                    <li>Each executes its own instruction sequence on its own data.</li>
+                    <li>Includes SMPs, clusters, NUMA, multi-core processors.</li>
+                    <li><strong>Most commercially important class.</strong></li>
+                </ul>
+                <span class="note-tag">Commercially dominant</span>
+            </div>
+        </div>
+
+        <!-- exam point -->
+        <div class="exam-point">
+            <div class="header">
+                <div class="shield">📌 KEY EXAM POINTS</div>
+            </div>
+            <div class="rows">
+                <div><span class="hl">SISD</span> = Uniprocessor.</div>
+                <div><span class="hl">SIMD</span> = One instruction, many data (lockstep).</div>
+                <div><span class="hl">MISD</span> = Theoretical only.</div>
+                <div><span class="hl">MIMD</span> = General purpose, commercially dominant.</div>
+                <div><span class="hl">SIMD and MIMD</span> are the most commonly tested classes.</div>
+            </div>
+        </div>
+
+        <!-- subtle divider (styling only) -->
+        <div class="divider"></div>
+    </div>
+</body>
+</html>

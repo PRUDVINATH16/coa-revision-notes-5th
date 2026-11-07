@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Organization · Exam Notes Index</title>
+    <style>
+        /* Blue & White theme — clean navigation hub */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f8fcff 0%, #e6f2ff 100%);
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #0a2b4e;
+        }
+
+        .index-card {
+            background-color: #ffffff;
+            max-width: 840px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 80, 200, 0.25),
+                        0 6px 18px -8px rgba(0, 60, 130, 0.15),
+                        inset 0 1px 0 #ffffff;
+            border: 1px solid #cde3ff;
+            padding: 2.2rem 2.4rem 2.6rem;
+        }
+
+        /* accent bar */
+        .index-card::before {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 5px;
+            background: #1a6eff;
+            border-radius: 20px;
+            margin-bottom: 1.6rem;
+            box-shadow: 0 2px 6px rgba(26, 110, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #003b8f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.4rem;
+            border-bottom: 2px solid #e3efff;
+            padding-bottom: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #1a6eff;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.22rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.3);
+        }
+
+        .subtitle {
+            color: #4a6f9e;
+            font-size: 0.98rem;
+            font-weight: 500;
+            margin: 1rem 0 1.8rem;
+            line-height: 1.5;
+        }
+
+        /* topic links list */
+        .topic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            list-style: none;
+        }
+
+        .topic-list li {
+            animation: fadeIn 0.3s ease both;
+        }
+
+        .topic-list li:nth-child(1) { animation-delay: 0.02s; }
+        .topic-list li:nth-child(2) { animation-delay: 0.05s; }
+        .topic-list li:nth-child(3) { animation-delay: 0.08s; }
+        .topic-list li:nth-child(4) { animation-delay: 0.11s; }
+        .topic-list li:nth-child(5) { animation-delay: 0.14s; }
+        .topic-list li:nth-child(6) { animation-delay: 0.17s; }
+        .topic-list li:nth-child(7) { animation-delay: 0.20s; }
+        .topic-list li:nth-child(8) { animation-delay: 0.23s; }
+        .topic-list li:nth-child(9) { animation-delay: 0.26s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .topic-link {
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
+            background: #f9fcff;
+            padding: 1rem 1.3rem;
+            border-radius: 18px;
+            border: 2px solid #d0e3ff;
+            text-decoration: none;
+            color: #002856;
+            transition: all 0.16s ease;
+            box-shadow: 0 3px 8px rgba(0, 80, 180, 0.04);
+        }
+
+        .topic-link:hover {
+            background: #edf5ff;
+            border-color: #1a6eff;
+            transform: translateX(5px);
+            box-shadow: 0 10px 20px -10px #1a6eff66;
+        }
+
+        .topic-link:active {
+            transform: translateX(2px) scale(0.995);
+        }
+
+        .topic-num {
+            background: #1a6eff;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(26, 110, 255, 0.35);
+            flex-shrink: 0;
+            transition: 0.16s;
+        }
+
+        .topic-link:hover .topic-num {
+            background: #0047b3;
+            transform: rotate(-3deg) scale(1.04);
+        }
+
+        .topic-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .topic-title {
+            font-size: 1.06rem;
+            font-weight: 600;
+            color: #003b8f;
+            line-height: 1.35;
+            letter-spacing: -0.01em;
+        }
+
+        .topic-meta {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #6b8cb8;
+        }
+
+        .topic-arrow {
+            font-size: 1.3rem;
+            color: #1a6eff;
+            font-weight: 700;
+            opacity: 0.6;
+            transition: 0.16s;
+            flex-shrink: 0;
+        }
+
+        .topic-link:hover .topic-arrow {
+            opacity: 1;
+            transform: translateX(3px);
+        }
+
+        /* footer note */
+        .footer-note {
+            margin-top: 2rem;
+            padding-top: 1.4rem;
+            border-top: 1px solid #e3efff;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #7c9ac0;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        .footer-note span {
+            color: #1a6eff;
+            font-weight: 600;
+        }
+
+        /* responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.8rem;
+            }
+            .index-card {
+                padding: 1.6rem 1.2rem 2rem;
+                border-radius: 24px;
+            }
+            h1 {
+                font-size: 1.55rem;
+            }
+            .topic-link {
+                padding: 0.85rem 1rem;
+                gap: 0.8rem;
+            }
+            .topic-num {
+                min-width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+                border-radius: 12px;
+            }
+            .topic-title {
+                font-size: 0.96rem;
+            }
+            .topic-meta {
+                font-size: 0.76rem;
+            }
+            .topic-arrow {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="index-card">
+        <h1>📚 Computer Organization <span>Exam Notes</span></h1>
+        <p class="subtitle">Nine quick-revision topics covering pipelining, hazards, parallel processors, cache coherence, and GPU architecture. Click any topic to open its notes.</p>
+
+        <ul class="topic-list">
+            <li>
+                <a class="topic-link" href="topic1.html">
+                    <span class="topic-num">01</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Basic Concepts of Pipelining</span>
+                        <span class="topic-meta">Stages · throughput · latency · interstage buffers</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic2.html">
+                    <span class="topic-num">02</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Pipeline Performance Metrics</span>
+                        <span class="topic-meta">Speedup · efficiency · ideal vs. real speedup</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic3.html">
+                    <span class="topic-num">03</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Pipeline Hazards (Overview &amp; Structural)</span>
+                        <span class="topic-meta">Stalls · bubbles · Harvard architecture</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic4.html">
+                    <span class="topic-num">04</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Data Hazards</span>
+                        <span class="topic-meta">RAW · WAW · WAR · forwarding · load-use hazard</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic5.html">
+                    <span class="topic-num">05</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Control / Instruction Hazards</span>
+                        <span class="topic-meta">Branch penalty · delay slots · static &amp; dynamic prediction</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic6.html">
+                    <span class="topic-num">06</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Parallel Processors &amp; Flynn's Classification</span>
+                        <span class="topic-meta">SISD · SIMD · MISD · MIMD · levels of parallelism</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic7.html">
+                    <span class="topic-num">07</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Multiprocessors &amp; Multi-Core Systems</span>
+                        <span class="topic-meta">SMP · UMA vs. NUMA · multicore · Amdahl's Law</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic8.html">
+                    <span class="topic-num">08</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Cache Coherence Problem &amp; Solutions</span>
+                        <span class="topic-meta">Snoopy · directory · MESI protocol · coherence rules</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+            <li>
+                <a class="topic-link" href="topic9.html">
+                    <span class="topic-num">09</span>
+                    <span class="topic-info">
+                        <span class="topic-title">Graphics Processing Unit (GPU)</span>
+                        <span class="topic-meta">SM architecture · latency hiding · CPU vs. GPU · CUDA</span>
+                    </span>
+                    <span class="topic-arrow">→</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="footer-note">
+            <span>9 topics</span> · exam-ready · blue &amp; white theme
+        </div>
+    </div>
+</body>
+</html>
